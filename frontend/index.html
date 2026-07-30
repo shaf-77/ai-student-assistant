@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Student Assistant</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-theme="light">
+
+  <div class="app-layout">
+
+    <!-- Mobile top bar -->
+    <div class="topbar">
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open menu">☰</button>
+      <span class="topbar-title">📚 AI Student Assistant</span>
+    </div>
+
+    <!-- Sidebar overlay (mobile only, click to close sidebar) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo">📚</span>
+        <span class="brand-name">Student Assistant</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">🏠</span> Dashboard
+        </button>
+        <button class="nav-item" data-page="upload">
+          <span class="nav-icon">📤</span> Upload Notes
+        </button>
+        <button class="nav-item" data-page="qa">
+          <span class="nav-icon">💬</span> Ask Questions
+        </button>
+        <button class="nav-item" data-page="summary">
+          <span class="nav-icon">📝</span> Summarize
+        </button>
+        <button class="nav-item" data-page="quiz">
+          <span class="nav-icon">🧠</span> Quiz
+        </button>
+        <button class="nav-item" data-page="timetable">
+          <span class="nav-icon">📅</span> Timetable
+        </button>
+        <button class="nav-item" data-page="assignments">
+          <span class="nav-icon">✅</span> Assignments
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+          <span id="themeIcon">🌙</span> <span id="themeLabel">Dark Mode</span>
+        </button>
+        <div class="connection-status">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="statusText">Connecting...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+      <!-- ===== DASHBOARD PAGE ===== -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>Welcome back 👋</h1>
+          <p>Here's an overview of your study workspace.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number" id="statNotesCount">0</span>
+            <span class="stat-label">Notes Uploaded</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="statPendingCount">0</span>
+            <span class="stat-label">Pending Assignments</span>
+          </div>
+          <div class="stat-card stat-card-warning">
+            <span class="stat-number" id="statDueSoonCount">0</span>
+            <span class="stat-label">Due Soon / Overdue</span>
+          </div>
+        </div>
+
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="feature-cards-grid">
+          <div class="feature-card" data-page="upload">
+            <span class="feature-icon">📤</span>
+            <h3>Upload Notes</h3>
+            <p>Add PDFs or paste text to build your knowledge base.</p>
+          </div>
+          <div class="feature-card" data-page="qa">
+            <span class="feature-icon">💬</span>
+            <h3>Ask Questions</h3>
+            <p>Get answers grounded strictly in your own notes.</p>
+          </div>
+          <div class="feature-card" data-page="summary">
+            <span class="feature-icon">📝</span>
+            <h3>Summarize</h3>
+            <p>Short, detailed, or bullet-point summaries instantly.</p>
+          </div>
+          <div class="feature-card" data-page="quiz">
+            <span class="feature-icon">🧠</span>
+            <h3>Generate Quiz</h3>
+            <p>Test yourself with MCQ and short-answer questions.</p>
+          </div>
+          <div class="feature-card" data-page="timetable">
+            <span class="feature-icon">📅</span>
+            <h3>Study Timetable</h3>
+            <p>A personalized schedule based on your exam dates.</p>
+          </div>
+          <div class="feature-card" data-page="assignments">
+            <span class="feature-icon">✅</span>
+            <h3>Assignments</h3>
+            <p>Track deadlines and mark work as completed.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== UPLOAD PAGE ===== -->
+      <div id="page-upload" class="page">
+        <div class="page-header">
+          <h1>Upload Notes</h1>
+          <p>Add a PDF or paste text to start building your notes library.</p>
+        </div>
+
+        <section class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="pdf-tab">Upload PDF</button>
+            <button class="tab-btn" data-tab="text-tab">Paste Text</button>
+          </div>
+
+          <div id="pdf-tab" class="tab-content active">
+            <input type="file" id="pdfInput" accept=".pdf" />
+            <button id="uploadPdfBtn">Upload PDF</button>
+          </div>
+
+          <div id="text-tab" class="tab-content">
+            <input type="text" id="textTitle" placeholder="Note title (e.g. Chapter 3 - Thermodynamics)" />
+            <textarea id="textContent" rows="6" placeholder="Paste your notes here..."></textarea>
+            <button id="uploadTextBtn">Save Note</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Your Notes</h2>
+          <div id="notesList">Loading notes...</div>
+        </section>
+      </div>
+
+      <!-- ===== Q&A PAGE ===== -->
+      <div id="page-qa" class="page">
+        <div class="page-header">
+          <h1>Ask Questions</h1>
+          <p>Answers come only from your uploaded notes.</p>
+        </div>
+
+        <section class="card">
+          <select id="noteSelect">
+            <option value="">All Notes</option>
+          </select>
+
+          <textarea id="questionInput" rows="2" placeholder="Ask something about your notes..."></textarea>
+          <button id="askBtn">Ask</button>
+
+          <div id="answerBox" class="answer-box" style="display:none;">
+            <p id="answerText"></p>
+            <span id="answerMeta"></span>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== SUMMARY PAGE ===== -->
+      <div id="page-summary" class="page">
+        <div class="page-header">
+          <h1>Summarize Notes</h1>
+          <p>Choose a style that fits how you review.</p>
+        </div>
+
+        <section class="card">
+          <select id="summaryNoteSelect">
+            <option value="">Select a note...</option>
+          </select>
+
+          <div class="summary-type-buttons">
+            <button class="summary-type-btn active" data-type="short">Short</button>
+            <button class="summary-type-btn" data-type="detailed">Detailed</button>
+            <button class="summary-type-btn" data-type="bullet">Bullet Points</button>
+          </div>
+
+          <button id="generateSummaryBtn">Generate Summary</button>
+
+          <div id="summaryBox" class="answer-box" style="display:none;">
+            <pre id="summaryText"></pre>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== QUIZ PAGE ===== -->
+      <div id="page-quiz" class="page">
+        <div class="page-header">
+          <h1>Generate Quiz</h1>
+          <p>Test your understanding at your own pace.</p>
+        </div>
+
+        <section class="card">
+          <select id="quizNoteSelect">
+            <option value="">Select a note...</option>
+          </select>
+
+          <select id="quizTypeSelect">
+            <option value="mcq">Multiple Choice</option>
+            <option value="short_answer">Short Answer</option>
+            <option value="mixed">Mixed</option>
+          </select>
+
+          <select id="quizDifficultySelect">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+
+          <button id="generateQuizBtn">Generate Quiz</button>
+
+          <div id="quizContainer">
+            <div class="empty-state">
+              <span class="empty-state-icon">🧠</span>
+              <p class="empty-state-title">No quiz yet</p>
+              <p class="empty-state-subtitle">Pick a note and difficulty above, then generate one.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== TIMETABLE PAGE ===== -->
+      <div id="page-timetable" class="page">
+        <div class="page-header">
+          <h1>Study Timetable</h1>
+          <p>A personalized daily plan based on your exams and priorities.</p>
+        </div>
+
+        <section class="card">
+          <div id="subjectsList"></div>
+          <button id="addSubjectBtn" type="button">+ Add Subject</button>
+
+          <label for="hoursPerDay" class="field-label">Available study hours per day</label>
+          <input type="number" id="hoursPerDay" min="1" max="16" step="0.5" value="4" />
+
+          <button id="generateTimetableBtn">Generate Timetable</button>
+
+          <div id="timetableResult">
+            <div class="empty-state">
+              <span class="empty-state-icon">📅</span>
+              <p class="empty-state-title">No timetable generated</p>
+              <p class="empty-state-subtitle">Add your subjects and exam dates above to get a personalized plan.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== ASSIGNMENTS PAGE ===== -->
+      <div id="page-assignments" class="page">
+        <div class="page-header">
+          <h1>Assignment Reminders</h1>
+          <p>Never miss a deadline.</p>
+        </div>
+
+        <section class="card">
+          <div class="assignment-form">
+            <input type="text" id="assignmentTitle" placeholder="Assignment title (e.g. Lab Report)" />
+            <input type="text" id="assignmentSubject" placeholder="Subject (e.g. Chemistry)" />
+            <input type="date" id="assignmentDueDate" />
+            <button id="addAssignmentBtn">Add Assignment</button>
+          </div>
+
+          <div id="assignmentsList"></div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast notification container -->
+  <div id="toastContainer"></div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
